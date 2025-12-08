@@ -1,9 +1,9 @@
 #include <LiquidCrystal.h>
 
-// ===================== LCD =====================
+// lcd pins on arduino
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
-// ===================== Motor Pins =====================
+// motor pins on arduino
 #define L_PWM   11
 #define R_PWM   3
 #define L_IN1   A1
@@ -11,10 +11,11 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 #define R_IN1   12
 #define R_IN2   13
 
+//startup, meh just print something on lcd for fun 
 void setup() {
     // LCD
     lcd.begin(16, 2);
-    lcd.print("BT Car Ready");
+    lcd.print("bluetooth Car Ready");
 
     // Motors
     pinMode(L_PWM, OUTPUT);
@@ -28,7 +29,7 @@ void setup() {
     Serial.begin(9600);
 }
 
-// ===================== Motor Control =====================
+// controlling movement of motors
 void forward() {
     digitalWrite(L_IN1, HIGH);
     digitalWrite(L_IN2, LOW);
@@ -65,11 +66,13 @@ void right() {
     analogWrite(R_PWM, 150);
 }
 
+//stop vehicle
 void stopCar() {
     analogWrite(L_PWM, 0);
     analogWrite(R_PWM, 0);
 }
 
+//actions done in a loop
 void loop() {
     if (Serial.available()) {
         char cmd = Serial.read();
