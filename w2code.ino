@@ -1,19 +1,18 @@
 #include <LiquidCrystal.h>
 
-// ======================= LCD 屏幕 =======================
+// lcd pins on arduino
 LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 
-// ======================= 引脚定义 =======================
-// IR 传感器：左 & 右黑线→LOW，中间黑线→HIGH
+// light sensor pins on arduino
 #define IR_LEFT   A3
 #define IR_MID    A2
 #define IR_RIGHT  A1
 
-// 编码器（PCINT1）
+// encoder pins on arduino
 #define ENC_LEFT  A5   // PCINT21
 #define ENC_RIGHT A4   // PCINT20
 
-// 电机引脚
+// motor pins on arduino
 #define L_PWM   11
 #define R_PWM   3
 #define L_IN1   1
@@ -21,12 +20,12 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 #define R_IN1   12
 #define R_IN2   13
 
-// ======================= 车辆参数 =======================
-const int baseSpeed = 180;      // 基本速度
-const float wheelCirc = 23.5;    // 轮子周长 (cm)
-const float encoderPPR = 40.0;  // 每圈脉冲数
+// declare vehicle constant values
+const int baseSpeed = 180;     
+const float circumference = 23.5;   
+const float encoderPPR = 40.0; 
 
-// ======================= 全局变量 =======================
+// global variables
 volatile long leftCount = 0;
 volatile long rightCount = 0;
 
@@ -37,7 +36,7 @@ unsigned long allBlackTimer = 0;
 float distance = 0.0;
 bool stoppedForever = false;
 
-// ======================= 函数声明 =======================
+// function declare
 void readIRSensors(bool &L, bool &M, bool &R);
 void motorStopHard();
 void setMotor(int Lspd, int Rspd);
@@ -45,7 +44,7 @@ int speedTrim();
 void updateLCD();
 float updateDist();
 
-// ======================= 强制停止（永久） =======================
+// function to stop and shut down all motors
 void motorStopHard() {
   analogWrite(L_PWM, 0);
   analogWrite(R_PWM, 0);
@@ -56,7 +55,7 @@ void motorStopHard() {
   stoppedForever = true;
 }
 
-// ======================= 编码器 PCINT 中断 =======================
+// left and right encoders count
 volatile bool lastA4 = HIGH;
 volatile bool lastA5 = HIGH;
 
@@ -71,10 +70,10 @@ ISR(PCINT1_vect) {
   lastA5 = currA5;
 }
 
-// ======================= 电机控制 =======================
+// function to control speed of left and right motors easily
 void setMotor(int Lspd, int Rspd) {
 
-  // 左轮方向设置
+  //left motors
   if (Lspd >= 0) {
     digitalWrite(L_IN1, HIGH);
     digitalWrite(L_IN2, LOW);
@@ -84,7 +83,7 @@ void setMotor(int Lspd, int Rspd) {
     Lspd = -Lspd;
   }
 
-  // 右轮方向设置
+  // right motors
   if (Rspd >= 0) {
     digitalWrite(R_IN1, HIGH);
     digitalWrite(R_IN2, LOW);
@@ -98,27 +97,27 @@ void setMotor(int Lspd, int Rspd) {
   analogWrite(R_PWM, constrain(Rspd, 0, 255));
 }
 
-// ======================= 软件速度补偿（软修正） =======================
+// speed trim function
 int speedTrim() {
   long diff = rightCount - leftCount;
   return constrain(diff * 2, -60, 60);
 }
 
-// ======================= 读取三个 IR 传感器 =======================
+// function to read outputs of light sensors
 void readIRSensors(bool &L, bool &M, bool &R) {
   L = (digitalRead(IR_LEFT)  == LOW);
   M = (digitalRead(IR_MID)   == HIGH);
   R = (digitalRead(IR_RIGHT) == LOW);
 }
 
-// ======================= 计算距离 =======================
+// distance calculation
 float updateDist() {
   float rev = ((leftCount + rightCount) / 2.0) / encoderPPR;
-  distance = rev * wheelCirc;
+  distance = rev * circumference;
   return distance;
 }
 
-// ======================= LCD 更新 =======================
+// update lcd display
 void updateLCD() {
   lcd.setCursor(0, 0);
   lcd.print("Time: ");
@@ -131,7 +130,7 @@ void updateLCD() {
   lcd.print("cm      ");
 }
 
-// ======================= SETUP =======================
+// startup the vehicle
 void setup() {
   Serial.begin(9600);
   lcd.begin(16, 2);
@@ -150,7 +149,6 @@ void setup() {
   pinMode(R_IN1, OUTPUT);
   pinMode(R_IN2, OUTPUT);
 
-  // 启用 PCINT1 (A0-A5)
   PCICR |= (1 << PCIE1);
   PCMSK1 |= (1 << PCINT20) | (1 << PCINT21);
 
@@ -160,56 +158,56 @@ void setup() {
   delay(1000);
 }
 
-// ======================= LOOP 主程序 =======================
+// actions done in a loop
 void loop() {
   bool L, M, R;
   readIRSensors(L, M, R);
 
-  // ----------- 永久停止状态保持 -----------
+  // shut down motors
   if (stoppedForever) {
     motorStopHard();
     return;
   }
 
-      // ----------- 全黑 → 永久停止 -----------
+      // stop motors when all 3 sensor detects black lines
   if (L && M && R) {
     motorStopHard();
     return;
   }
 
-// ----------- 原地旋转（全白超过300ms触发） -----------
+// clockwise rotate 360 degrees when all 3 sensor detects white for more than 200ms
 if (!L && !M && !R) {
-    if (allWhiteTimer == 0) allWhiteTimer = millis();  // 记录开始时间
+    if (allWhiteTimer == 0) allWhiteTimer = millis();  // start timer whenever all sensor detects white
 
     if (millis() - allWhiteTimer > 200) {      
-        setMotor(255, -255);   // 顺时针旋转：左前右后
+        setMotor(255, -255);   // rotate 360 degrees
         updateLCD();
         return;
     }
 } else {
-    allWhiteTimer = 0;   // 只要有黑线，重置计时器
+    allWhiteTimer = 0;   // reset timer when any of the sensor detects black
 }
 
-  // ----------- 速度补偿（软修正） -----------
+  // speed trim and adjustments on motors
   int trim = speedTrim();
   int Lspd = baseSpeed - trim;
   int Rspd = baseSpeed + trim;
 
-  // ----------- 线路跟随逻辑 -----------
+  // line following
   if (M) {
-    // 中间黑线 → 直行
+    // middle detect black
     setMotor(Lspd, Rspd);
   } 
   else if ((M && L) || (L && !M && !R)) {
-    // 左黑线 → 右转硬修正
+    // black line on left, increase right motor speed
     setMotor(Lspd - 160, Rspd + 140);
   }
   else if ((M && R) || (!L && !M && R)) {
-    // 右黑线 → 左转硬修正
+    // black line on right, increase left motor speed
     setMotor(Lspd + 140 , Rspd - 160);
   }
 
-  // ----------- 更新显示 -----------  
+  // update display on lcd
   updateDist();
   updateLCD();
   delay(1);
