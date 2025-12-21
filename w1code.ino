@@ -1,4 +1,3 @@
-#include <Wire.h>
 #include <LiquidCrystal.h>
 
 //pins on lcd
