@@ -38,8 +38,8 @@ void setMotor(int Lspd, int Rspd) {
 
 //  obtain angle value from mpu
 float readAngleX() {
-    mpu.update();
-    return mpu.getAngleX();
+    mpu.update();//update current angle value
+    return mpu.getAngleX();//return the updated value
 }
 
 // update lcd to display angle
@@ -58,10 +58,10 @@ void setup() {
     lcd.begin(16, 2);
 
     Wire.begin();
-    mpu.begin();
-    mpu.setFilterGyroCoef(0.95);   
-    mpu.calcOffsets();            
-    delay(500);
+    mpu.begin();// initialize the I²C-bus
+    mpu.setFilterGyroCoef(0.95);   // 95% data from the gyroscope, can be changed
+    mpu.calcOffsets();    // calibrate, obtain a default angle        
+    delay(500); // time given for calcOffsets() to complete, car does not move
 
     pinMode(L_PWM, OUTPUT);
     pinMode(R_PWM, OUTPUT);
