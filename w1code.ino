@@ -17,7 +17,8 @@ void setup() {
   lcd.begin(16, 2);
   lcd.print("Initializing...");
   delay(2000);
-
+  
+//all in pins setup to output since signals are sent out to the motor driver
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
@@ -26,6 +27,7 @@ void setup() {
   pinMode(ENB, OUTPUT);
 
   moveStraight();
+  //timer starts when vehicle starts
   startMillis = millis();
 }
 
@@ -37,6 +39,7 @@ void moveStraight() {
 
 //function to stop motor at 10s
 void stopMotors() {
+  //low output, no movement
   digitalWrite(IN1, LOW); digitalWrite(IN2, LOW);
   digitalWrite(IN3, LOW); digitalWrite(IN4, LOW);
 }
