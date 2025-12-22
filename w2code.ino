@@ -195,14 +195,17 @@ if (!L && !M && !R) {
 
   // line following
   if (M) {
+    // middle gives high output
     // middle detect black
     setMotor(Lspd, Rspd);
   } 
   else if ((M && L) || (L && !M && !R)) {
+    // middle high left low, OR left and middle low right high
     // black line on left, increase right motor speed
     setMotor(Lspd - 160, Rspd + 140);
   }
   else if ((M && R) || (!L && !M && R)) {
+    // middle high right low, OR right and middle low left high
     // black line on right, increase left motor speed
     setMotor(Lspd + 140 , Rspd - 160);
   }
