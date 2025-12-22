@@ -80,8 +80,9 @@ void setup() {
 // actions performed in a loop
 void loop() {
     // get raw angle
-    float raw = readAngleX();
+    float raw = readAngleX();// defining the raw value
     angleFiltered = 0.3 * angleFiltered + 0.7 * raw;
+    // new angle now carries 30% of the old value, 70% of updated value from readAngleX() 
 
     // record the maximum angle (for easier recording of the ramp angle)
     if (angleFiltered > angleMax) angleMax = angleFiltered;
