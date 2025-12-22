@@ -46,11 +46,11 @@ void setMotor(int Lspd, int Rspd) {
 
 // get distance between sensor and obstacle
 long getDistance() {
-    digitalWrite(TRIG, LOW);
+    digitalWrite(TRIG, LOW);//pulse emitted, low for 2 micrseconds
     delayMicroseconds(2);
-    digitalWrite(TRIG, HIGH);
+    digitalWrite(TRIG, HIGH);//high for 10 microseconds
     delayMicroseconds(10);
-    digitalWrite(TRIG, LOW);
+    digitalWrite(TRIG, LOW);//return to low
 
     long duration = pulseIn(ECHO, HIGH, 25000); // duration at which obstacle is detected 25ms
     long distance = duration * 0.034 / 2;       // speed of sound =  340m/s → 0.034 cm/us
@@ -59,8 +59,8 @@ long getDistance() {
 
 // startup
 void setup() {
-  pinMode(TRIG, OUTPUT);
-  pinMode(ECHO, INPUT);
+  pinMode(TRIG, OUTPUT);//signal sent to trig to emit pulse
+  pinMode(ECHO, INPUT);//signal received from echo to determine range
 
   pinMode(L_PWM, OUTPUT);
   pinMode(R_PWM, OUTPUT);
