@@ -11,3 +11,21 @@ wpa=2
 wpa_passphrase=YourStrongPassword
 wpa_key_mgmt=WPA-PSK
 rsn_pairwise=CCMP
+
+● hostapd.service - Access point and authentication server for Wi-Fi and Ethernet
+     Loaded: loaded (/usr/lib/systemd/system/hostapd.service; enabled; preset: enabled)
+     Active: active (running) since Mon 2026-01-26 11:46:48 +08; 11s ago
+ Invocation: 3634d5d0bd0d443883d114b071dc6dea
+       Docs: man:hostapd(8)
+    Process: 8806 ExecStart=/usr/sbin/hostapd -B -P /run/hostapd.pid $DAEMON_OPTS ${DAEMON_CONF} (c>
+   Main PID: 8807 (hostapd)
+      Tasks: 1 (limit: 3918)
+        CPU: 46ms
+     CGroup: /system.slice/hostapd.service
+             └─8807 /usr/sbin/hostapd -B -P /run/hostapd.pid /etc/hostapd/hostapd.conf
+
+Jan 26 11:46:48 raspberrypi systemd[1]: Starting hostapd.service - Access point and authentication >
+Jan 26 11:46:48 raspberrypi (hostapd)[8806]: hostapd.service: Referenced but unset environment vari>
+Jan 26 11:46:48 raspberrypi hostapd[8806]: wlan0: interface state UNINITIALIZED->ENABLED
+Jan 26 11:46:48 raspberrypi hostapd[8806]: wlan0: AP-ENABLED
+Jan 26 11:46:48 raspberrypi systemd[1]: Started hostapd.service - Access point and authentication s>
