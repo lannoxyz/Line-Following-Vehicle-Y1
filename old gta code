@@ -1,0 +1,42 @@
+from gpiozero import Motor, PWMOutputDevice
+in1 = 11
+in2 = 12
+in3 = 13
+in4 = 15
+ena = 18
+enb = 19
+leftmotor = Motor(in1, in2)
+rightmotor = Motor(in3, in4)
+leftspeed = PWMOutputDevice(ena)
+rightspeed = PWMOutputDevice(enb)
+
+while True:
+	cmd = input("W forward, S backward, X stop, A left, D right ")
+	
+	if cmd == "w":
+		leftspeed.value = 0.6
+		rightspeed.value = 0.6
+		leftmotor.forward()
+		rightmotor.forward()
+	elif cmd == "s":
+		leftspeed.value = 0.6
+		rightspeed.value = 0.6
+		leftmotor.backward()
+		rightmotor.backward()
+	elif cmd == "x":
+		leftspeed.value = 0
+		rightspeed.value = 0
+		leftmotor.stop()
+		rightmotor.stop()
+	elif cmd == "a":
+		leftspeed.value = 0.3
+		rightspeed.value = 0.6
+		leftmotor.backward()
+		rightmotor.forward()
+	elif cmd == "d":
+		leftspeed.value = 0.6
+		rightspeed.value = 0.3
+		leftmotor.forward()
+		rightmotor.backward()
+	else:
+		print("Invalid input")
